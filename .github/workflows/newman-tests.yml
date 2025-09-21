@@ -1,4 +1,4 @@
-name: Run Postman Tests
+name: Run Newman Tests
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  postman-tests:
+  newman-tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,16 +22,21 @@ jobs:
       - name: Install Newman
         run: npm install -g newman
 
-      - name: Run Newman Tests
+      - name: Run Postman Collection with Newman
         run: |
-          newman run postman/collection.json \
-            --environment postman/environment.json \
+          newman run postman-tests/Dummy-JSON.postman_collection.json \
             --reporters cli,json,html \
             --reporter-html-export newman-report.html \
             --reporter-json-export newman-report.json
 
-      - name: Upload Test Report (HTML)
+      - name: Upload Newman HTML Report
         uses: actions/upload-artifact@v4
         with:
           name: newman-html-report
           path: newman-report.html
+
+      - name: Upload Newman JSON Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: newman-json-report
+          path: newman-report.json
