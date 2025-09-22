@@ -67,7 +67,7 @@ The suite covers **status checks**, **response structure**, **data validation**,
 
 ## 🔍 Example: GET `/users` Test Breakdown
 
-javascript
+```javascript
 // ✅ STATUS & PERFORMANCE TESTS
 pm.test("Response code is 200", () => {
     pm.response.to.have.status(200);
@@ -95,6 +95,7 @@ users.forEach(user => {
     pm.expect(user.hair.color).to.not.be.oneOf([null, undefined]);
     pm.expect(user.address.coordinates.lat).to.be.a("number");
 });
+
 ---
 
 ## 👤 Example: GET `/users/:id` Test Highlights
