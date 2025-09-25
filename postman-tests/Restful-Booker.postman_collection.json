@@ -1,0 +1,635 @@
+{
+	"info": {
+		"_postman_id": "cc09c605-9cb3-41cd-9853-3792575f6813",
+		"name": "Restful-Booker",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17644856"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// 📦 Parse response and set token",
+							"const jsonData = pm.response.json();",
+							"pm.environment.set(\"token\", jsonData.token);",
+							"",
+							"",
+							"// ✅🟢 STATUS & PERFORMANCE TESTS",
+							"pm.test(\"✅ Status code is 200 (Auth Successful)\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// 🔐📥 TOKEN VALIDATION TESTS",
+							"pm.test(\"📥 Token is returned and valid\", () => {",
+							"    pm.expect(jsonData.token).to.be.a(\"string\");",
+							"    pm.expect(jsonData.token, \"Token should not be null\").to.not.be.null;",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\" : \"admin\",\n    \"password\" : \"password123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://restful-booker.herokuapp.com/auth",
+					"protocol": "https",
+					"host": [
+						"restful-booker",
+						"herokuapp",
+						"com"
+					],
+					"path": [
+						"auth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Booking",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// 📦 Parse response and set environment variable",
+							"const bookingData = pm.response.json();",
+							"pm.environment.set(\"bookingId\", bookingData.bookingid);",
+							"pm.environment.set(\"firstName\", bookingData.booking.firstname);",
+							"pm.environment.set(\"lastName\", bookingData.booking.lastname);",
+							"pm.environment.set(\"totalPrice\", bookingData.booking.totalprice);",
+							"pm.environment.set(\"depositPaid\", bookingData.booking.depositpaid);",
+							"pm.environment.set(\"checkIn\", bookingData.booking.bookingdates.checkin);",
+							"pm.environment.set(\"checkOut\", bookingData.booking.bookingdates.checkout);",
+							"pm.environment.set(\"addNeeds\", bookingData.booking.additionalneeds);",
+							"",
+							"// 🧩 Define expected fields",
+							"const outerFields = [\"bookingid\", \"booking\"];",
+							"const bookingFields = [\"firstname\", \"lastname\", \"totalprice\", \"depositpaid\", \"bookingdates\", \"additionalneeds\"];",
+							"const bookingDatesFields = [\"checkin\", \"checkout\"];",
+							"",
+							"",
+							"// ✅🟢 STATUS & PERFORMANCE TESTS",
+							"pm.test(\"✅ Status code is 200\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"⏱️ Response time is under 500ms\", () => {",
+							"    pm.expect(pm.response.responseTime).to.be.below(500);",
+							"});",
+							"",
+							"",
+							"// ✅📦 STRUCTURE TEST",
+							"pm.test(\"📦 Response is an object\", () => {",
+							"    pm.expect(bookingData).to.be.an(\"object\");",
+							"});",
+							"",
+							"",
+							"// ❌🚫 NULL / UNDEFINED FIELD CHECKS",
+							"pm.test(\"🚫 Response fields are not null or undefined\", () => {",
+							"    outerFields.forEach((field) => {",
+							"        pm.expect(bookingData[field], `Field ${field} is null or undefined`).to.not.be.oneOf([null, undefined]);",
+							"    });",
+							"    bookingDatesFields.forEach((field) => {",
+							"        pm.expect(bookingData.booking.bookingdates[field], `Field ${field} is null or undefined`).to.not.be.oneOf([null, undefined]);",
+							"    });",
+							"});",
+							"",
+							"",
+							"// ✅🔍 FIELD PRESENCE TESTS",
+							"pm.test(\"🔍 Response contains all expected fields\", () => {",
+							"    outerFields.forEach((field => {",
+							"        pm.expect(bookingData, `Missing field ${field}`).to.have.property(field);",
+							"    }));",
+							"    bookingFields.forEach((field => {",
+							"        pm.expect(bookingData.booking, `Missing field ${field}`).to.have.property(field);",
+							"    }));",
+							"    bookingDatesFields.forEach((field => {",
+							"        pm.expect(bookingData.booking.bookingdates).to.have.property(field);",
+							"    }));",
+							"});",
+							"",
+							"",
+							"// ✅📐 DATA TYPE VALIDATION",
+							"pm.test(\"📐 Response fields contain correct data types\", () => {",
+							"    pm.expect(bookingData.bookingid).to.be.a(\"number\");",
+							"    bookingFieldsDataTypes = [",
+							"        { field: \"firstname\", type: \"string\" },",
+							"        { field: \"lastname\", type: \"string\" },",
+							"        { field: \"totalprice\", type: \"number\" },",
+							"        { field: \"depositpaid\", type: \"boolean\" },",
+							"        { field: \"additionalneeds\", type: \"string\"}",
+							"    ];",
+							"    bookingFieldsDataTypes.forEach(({field, type}) => {",
+							"        pm.expect(bookingData.booking[field]).to.be.a(type);",
+							"    });",
+							"    bookingDatesDataTypes = [",
+							"        { field: \"checkin\", type: \"string\" },",
+							"        { field: \"checkout\", type: \"string\" },",
+							"    ];",
+							"    bookingDatesDataTypes.forEach(({field, type}) => {",
+							"        pm.expect(bookingData.booking.bookingdates[field]).to.be.a(type);",
+							"    });",
+							"});",
+							"",
+							"",
+							"// ✅🧾 SCHEMA VALIDATION",
+							"const schema = {",
+							"  \"$schema\": \"http://json-schema.org/draft-07/schema#\",",
+							"  \"type\": \"object\",",
+							"  \"required\": [\"bookingid\", \"booking\"],",
+							"  \"properties\": {",
+							"    \"bookingid\": {",
+							"      \"type\": \"integer\"",
+							"    },",
+							"    \"booking\": {",
+							"      \"type\": \"object\",",
+							"      \"required\": [",
+							"        \"firstname\",",
+							"        \"lastname\",",
+							"        \"totalprice\",",
+							"        \"depositpaid\",",
+							"        \"bookingdates\",",
+							"        \"additionalneeds\"",
+							"      ],",
+							"      \"properties\": {",
+							"        \"firstname\": {",
+							"          \"type\": \"string\"",
+							"        },",
+							"        \"lastname\": {",
+							"          \"type\": \"string\"",
+							"        },",
+							"        \"totalprice\": {",
+							"          \"type\": \"number\"",
+							"        },",
+							"        \"depositpaid\": {",
+							"          \"type\": \"boolean\"",
+							"        },",
+							"        \"bookingdates\": {",
+							"          \"type\": \"object\",",
+							"          \"required\": [\"checkin\", \"checkout\"],",
+							"          \"properties\": {",
+							"            \"checkin\": {",
+							"              \"type\": \"string\",",
+							"              \"format\": \"date\"",
+							"            },",
+							"            \"checkout\": {",
+							"              \"type\": \"string\",",
+							"              \"format\": \"date\"",
+							"            }",
+							"          }",
+							"        },",
+							"        \"additionalneeds\": {",
+							"          \"type\": \"string\"",
+							"        }",
+							"      }",
+							"    }",
+							"  }",
+							"};",
+							"",
+							"pm.test(\"🧾 Schema is valid for POST /booking\", () => {",
+							"    pm.expect(bookingData).to.be.jsonSchema(schema);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstname\": \"JeffQA2\",\n    \"lastname\": \"MathewQA2\",\n    \"totalprice\": 330,\n    \"depositpaid\": true,\n    \"bookingdates\": {\n        \"checkin\": \"2025-10-23\",\n        \"checkout\": \"2025-10-26\"\n    },\n    \"additionalneeds\": \"Liquor\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/booking",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"booking"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Booking",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// 📦 Parse response and set environment variables",
+							"const bookingData = pm.response.json();",
+							"",
+							"const firstName = pm.environment.get(\"firstName\");",
+							"const lastName = pm.environment.get(\"lastName\");",
+							"const totalPrice = pm.environment.get(\"totalPrice\");",
+							"const depositPaid = pm.environment.get(\"depositPaid\");",
+							"const checkIn = pm.environment.get(\"checkIn\");",
+							"const checkOut = pm.environment.get(\"checkOut\");",
+							"const addNeeds = pm.environment.get(\"addNeeds\");",
+							"",
+							"// 🧩 Define expected fields",
+							"const bookingFields = [",
+							"    \"firstname\", \"lastname\", \"totalprice\", ",
+							"    \"depositpaid\", \"bookingdates\", \"additionalneeds\"",
+							"];",
+							"",
+							"const bookingDatesFields = [\"checkin\", \"checkout\"];",
+							"",
+							"",
+							"// ✅🟢 STATUS & PERFORMANCE TESTS",
+							"pm.test(\"✅ Status code is 200\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"⏱️ Response time is under 500ms\", () => {",
+							"    pm.expect(pm.response.responseTime).to.be.below(500);",
+							"});",
+							"",
+							"",
+							"// 📦✅ STRUCTURE TEST",
+							"pm.test(\"📦 Response is an object\", () => {",
+							"    pm.expect(bookingData).to.be.an(\"object\");",
+							"});",
+							"",
+							"",
+							"// 🚫❌ NULL / UNDEFINED FIELD CHECKS",
+							"pm.test(\"🚫 Response fields are not null or undefined\", () => {",
+							"    bookingFields.forEach((field) => {",
+							"        pm.expect(bookingData[field], `Field ${field} is null or undefined`).to.not.be.oneOf([null, undefined]);",
+							"    });",
+							"    bookingDatesFields.forEach((field) => {",
+							"        pm.expect(bookingData.bookingdates[field], `Field ${field} is null or undefined`).to.not.be.oneOf([null, undefined]);",
+							"    });",
+							"});",
+							"",
+							"",
+							"// 🔍✅ FIELD PRESENCE TESTS",
+							"pm.test(\"🔍 Response contains all expected fields\", () => {",
+							"    bookingFields.forEach((field => {",
+							"        pm.expect(bookingData, `Missing field ${field}`).to.have.property(field);",
+							"    }));",
+							"    bookingDatesFields.forEach((field => {",
+							"        pm.expect(bookingData.bookingdates, `Missing field ${field} in bookingdates`).to.have.property(field);",
+							"    }));",
+							"});",
+							"",
+							"",
+							"// 📐✅ DATA TYPE VALIDATION",
+							"pm.test(\"📐 Response fields contain correct data types\", () => {",
+							"    const bookingFieldsDataTypes = [",
+							"        { field: \"firstname\", type: \"string\" },",
+							"        { field: \"lastname\", type: \"string\" },",
+							"        { field: \"totalprice\", type: \"number\" },",
+							"        { field: \"depositpaid\", type: \"boolean\" },",
+							"        { field: \"additionalneeds\", type: \"string\"}",
+							"    ];",
+							"    bookingFieldsDataTypes.forEach(({field, type}) => {",
+							"        pm.expect(bookingData[field], `Field ${field} is not of type ${field.type}`).to.be.a(type);",
+							"    });",
+							"",
+							"    const bookingDatesDataTypes = [",
+							"        { field: \"checkin\", type: \"string\" },",
+							"        { field: \"checkout\", type: \"string\" },",
+							"    ];",
+							"    bookingDatesDataTypes.forEach(({field, type}) => {",
+							"        pm.expect(bookingData.bookingdates[field]).to.be.a(type);",
+							"    });",
+							"});",
+							"",
+							"",
+							"// 🧾✅ SCHEMA VALIDATION",
+							"const schema = {",
+							"  \"$schema\": \"http://json-schema.org/draft-07/schema#\",",
+							"  \"type\": \"object\",",
+							"  \"required\": [",
+							"    \"firstname\",",
+							"    \"lastname\",",
+							"    \"totalprice\",",
+							"    \"depositpaid\",",
+							"    \"bookingdates\",",
+							"    \"additionalneeds\"",
+							"  ],",
+							"  \"properties\": {",
+							"    \"firstname\": { \"type\": \"string\" },",
+							"    \"lastname\": { \"type\": \"string\" },",
+							"    \"totalprice\": { \"type\": \"number\" },",
+							"    \"depositpaid\": { \"type\": \"boolean\" },",
+							"    \"bookingdates\": {",
+							"      \"type\": \"object\",",
+							"      \"required\": [\"checkin\", \"checkout\"],",
+							"      \"properties\": {",
+							"        \"checkin\": { \"type\": \"string\", \"format\": \"date\" },",
+							"        \"checkout\": { \"type\": \"string\", \"format\": \"date\" }",
+							"      }",
+							"    },",
+							"    \"additionalneeds\": { \"type\": \"string\" }",
+							"  }",
+							"};",
+							"",
+							"pm.test(\"🧾 Schema is valid for GET /booking/:id\", () => {",
+							"    pm.expect(bookingData).to.be.jsonSchema(schema);",
+							"});",
+							"",
+							"",
+							"// 🔁✅ POST vs GET VALUE MATCH TEST",
+							"pm.test(\"🟰 POST response matches GET response\", () => {",
+							"    pm.expect(bookingData.firstname).to.eql(firstName);",
+							"    pm.expect(bookingData.lastname).to.eql(lastName);",
+							"    pm.expect(bookingData.totalprice).to.eql(Number(totalPrice));",
+							"    pm.expect(bookingData.depositpaid).to.eql(depositPaid);",
+							"    pm.expect(bookingData.bookingdates.checkin).to.eql(checkIn);",
+							"    pm.expect(bookingData.bookingdates.checkout).to.eql(checkOut);",
+							"    pm.expect(bookingData.additionalneeds).to.eql(addNeeds);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/booking/{{bookingId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"booking",
+						"{{bookingId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Bookings",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// 📦 Parse response and set environment variables",
+							"const bookingData = pm.response.json();",
+							"",
+							"// ✅🟢 STATUS & PERFORMANCE TESTS",
+							"pm.test(\"✅ Status code is 200\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"⏱️ Response time is under 500ms\", () => {",
+							"    pm.expect(pm.response.responseTime).to.be.below(500);",
+							"});",
+							"",
+							"",
+							"// 📦✅ STRUCTURE TEST",
+							"pm.test(\"📦 Response is an array\", () => {",
+							"    pm.expect(bookingData).to.be.an(\"array\");",
+							"});",
+							"",
+							"// ✅🔢 VALIDATE CONTENT TYPE",
+							"pm.test(\"🔢 All booking entries are objects with bookingid (number)\", () => {",
+							"    bookingData.forEach((data) => {",
+							"        pm.expect(data).to.be.an(\"object\");",
+							"        pm.expect(data).to.have.property(\"bookingid\");",
+							"        pm.expect(data.bookingid).to.be.a(\"number\");",
+							"    });",
+							"});",
+							"",
+							"// 🧾✅ SCHEMA VALIDATION",
+							"",
+							"const schema = {",
+							"  type: \"array\",",
+							"  items: {",
+							"    type: \"object\",",
+							"    required: [\"bookingid\"],",
+							"    properties: {",
+							"      bookingid: { type: \"integer\" }",
+							"    }",
+							"  }",
+							"};",
+							"",
+							"pm.test(\"🧾 Schema is valid for GET /booking\", () => {",
+							"    pm.expect(bookingData).to.be.jsonSchema(schema);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/booking",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"booking"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Booking",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// 📦 Parse response and set environment variables",
+							"const bookingData = pm.response.json();",
+							"",
+							"const updatedFirstName = pm.environment.get(\"updatedFirstName\");",
+							"const updatedLastName = pm.environment.get(\"updatedLastName\");",
+							"const updatedTotalPrice = pm.environment.get(\"updatedTotalPrice\");",
+							"const updatedDepositPaid = pm.environment.get(\"updatedDepositPaid\");",
+							"const updatedCheckIn = pm.environment.get(\"updatedCheckIn\");",
+							"const updatedCheckOut = pm.environment.get(\"updatedCheckOut\");",
+							"const updatedAddNeeds = pm.environment.get(\"updatedAddNeeds\");",
+							"",
+							"// 🧩 Define expected fields",
+							"const bookingFields = [",
+							"    \"firstname\", \"lastname\", \"totalprice\", ",
+							"    \"depositpaid\", \"bookingdates\", \"additionalneeds\"",
+							"];",
+							"",
+							"const bookingDatesFields = [\"checkin\", \"checkout\"];",
+							"",
+							"// ✅🟢 STATUS & PERFORMANCE TESTS",
+							"pm.test(\"✅ Status code is 200\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"⏱️ Response time is under 500ms\", () => {",
+							"    pm.expect(pm.response.responseTime).to.be.below(500);",
+							"});",
+							"",
+							"// 🚫❌ NULL / UNDEFINED FIELD CHECKS",
+							"pm.test(\"🚫 Response fields are not null or undefined\", () => {",
+							"    bookingFields.forEach((field) => {",
+							"        pm.expect(bookingData[field], `Field ${field} is null or undefined`).to.not.be.oneOf([null, undefined]);",
+							"    });",
+							"    bookingDatesFields.forEach((field) => {",
+							"        pm.expect(bookingData.bookingdates[field], `Field ${field} is null or undefined`).to.not.be.oneOf([null, undefined]);",
+							"    });",
+							"});",
+							"",
+							"// 🔍✅ FIELD PRESENCE TESTS",
+							"pm.test(\"Response contains all expected fields\", () => {",
+							"    bookingFields.forEach((field) => {",
+							"        pm.expect(bookingData, `Missing field ${field}`).to.have.property(field);",
+							"    })",
+							"    bookingDatesFields.forEach((field) => {",
+							"        pm.expect(bookingData.bookingdates, `Missing field ${field} in bookingdates`).to.have.property(field);",
+							"    });",
+							"})",
+							"",
+							"// 📐✅ DATA TYPE VALIDATION",
+							"pm.test(\"📐 Response fields contain correct data types\", () => {",
+							"    const bookingFieldsDataTypes = [",
+							"        { field: \"firstname\", type: \"string\" },",
+							"        { field: \"lastname\", type: \"string\" },",
+							"        { field: \"totalprice\", type: \"number\" },",
+							"        { field: \"depositpaid\", type: \"boolean\" },",
+							"        { field: \"additionalneeds\", type: \"string\" },",
+							"",
+							"    ];",
+							"",
+							"    bookingFieldsDataTypes.forEach(({field, type}) => {",
+							"        pm.expect(bookingData[field], `Field ${field} is not of type ${type}`).to.be.a(type);",
+							"    });",
+							"",
+							"    const bookingDatesFieldsDataTypes = [",
+							"        { field: \"checkin\", type: \"string\" },",
+							"        { field: \"checkout\", type: \"string\" },",
+							"    ]",
+							"    bookingDatesFieldsDataTypes.forEach(({field, type}) => {",
+							"        pm.expect(bookingData.bookingdates[field], `Field ${field} is not of type ${type}`).to.be.a(type);",
+							"    });",
+							"});",
+							"",
+							"// 🔍✅ VALUE CHECKS",
+							"pm.test(\"🔍 Response values match expected values\", () => {",
+							"    pm.expect(bookingData.firstname).to.eql(updatedFirstName);",
+							"    pm.expect(bookingData.lastname).to.eql(updatedLastName);",
+							"    pm.expect(bookingData.totalprice).to.eql(Number(updatedTotalPrice));",
+							"    pm.expect(bookingData.depositpaid).to.eql(updatedDepositPaid);",
+							"    pm.expect(bookingData.bookingdates.checkin).to.eql(updatedCheckIn);",
+							"    pm.expect(bookingData.bookingdates.checkout).to.eql(updatedCheckOut);",
+							"    pm.expect(bookingData.additionalneeds).to.eql(updatedAddNeeds);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// 📝📦 Parse Request Body",
+							"const requestBody = pm.request.body.raw;",
+							"const parsedBody = JSON.parse(requestBody);",
+							"",
+							"// 📌💾 Set Environment Variables for Updated Booking Fields",
+							"pm.environment.set(\"updatedFirstName\", parsedBody.firstname);",
+							"pm.environment.set(\"updatedLastName\", parsedBody.lastname);",
+							"pm.environment.set(\"updatedTotalPrice\", parsedBody.totalprice);",
+							"pm.environment.set(\"updatedDepositPaid\", parsedBody.depositpaid);",
+							"pm.environment.set(\"updatedCheckIn\", parsedBody.bookingdates.checkin);",
+							"pm.environment.set(\"updatedCheckOut\", parsedBody.bookingdates.checkout);",
+							"pm.environment.set(\"updatedAddNeeds\", parsedBody.additionalneeds);",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "token={{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstname\": \"JeffQA4\",\n    \"lastname\": \"MathewQA4\",\n    \"totalprice\": 330,\n    \"depositpaid\": true,\n    \"bookingdates\": {\n        \"checkin\": \"2025-10-23\",\n        \"checkout\": \"2025-10-26\"\n    },\n    \"additionalneeds\": \"Liquor\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/booking/{{bookingId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"booking",
+						"{{bookingId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
