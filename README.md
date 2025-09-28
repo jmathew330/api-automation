@@ -1,4 +1,4 @@
-# 🏨 RestfulBooker API - Postman Collection
+# 🏨 Booking API - Postman Collection
 
 This Postman collection provides **automated API tests** for managing **Booking** resources, covering creating, updating, partially updating, and deleting bookings. It validates API functionality, response correctness, authentication, and performance.
 
@@ -111,5 +111,3 @@ This Postman collection provides **automated API tests** for managing **Booking*
 - Negative tests ensure proper handling of unauthenticated requests.
 - Environment variables are cleaned up after deletion to avoid clutter.
 - Modify `baseUrl` and token values per your setup.
----
-
