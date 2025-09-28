@@ -30,6 +30,9 @@ jobs:
             --environment postman-tests/RestfulBookerEnv.postman_environment.json \
             --reporters cli,json,htmlextra \
             --reporter-htmlextra-export newman-report.html \
+            --reporter-htmlextra-title "Restful Booker API Test Report" \
+            --reporter-htmlextra-browserTitle "testing performed by Jeffin Mathew" \
+            --reporter-htmlextra-summary "Automated test results for critical REST API endpoints in the Restful Booker app." \
             --reporter-json-export newman-report.json
 
       - name: List files after Newman run
