@@ -1,4 +1,4 @@
-# 🏨 Booking API - Postman Collection
+# 🏨 RESTful Booker API - Postman Collection
 
 This Postman collection provides **automated API tests** for managing **Booking** resources, covering creating, updating, partially updating, and deleting bookings. It validates API functionality, response correctness, authentication, and performance.
 
