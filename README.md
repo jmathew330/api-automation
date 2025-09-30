@@ -82,7 +82,7 @@ This Postman collection provides **automated API tests** for managing **Booking*
 - `bookingId`: 🆔 ID of the current booking.
 - Other temp variables: `firstName`, `lastName`, `updatedFirstName`, etc., for validation.
 
-## 📊 Execution Results in Newman
+## 📊 Execution Summary
 
 <img width="800" alt="Screen Shot 2025-09-30 at 3 16 51 PM" src="https://github.com/user-attachments/assets/dcff25fa-9ad1-4620-ad03-4f4ae99b5c5e" />
 
@@ -117,4 +117,5 @@ This Postman collection provides **automated API tests** for managing **Booking*
 - Negative tests ensure proper handling of unauthenticated requests.
 - Environment variables are cleaned up after deletion to avoid clutter.
 - Modify `baseUrl` and token values per your setup.
+
 
